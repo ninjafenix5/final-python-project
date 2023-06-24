@@ -1,0 +1,96 @@
+OPPONENT = "player_2"
+
+score_p1 = 0
+score_p2 = 0
+import random
+def choose_opponent():
+    global OPPONENT
+    o = input("do you want to play against the pc or a player_2 ?: ")
+    if o == "pc" :
+        print("you chose to play against pc, good luck!")
+        OPPONENT = "pc"
+    elif o == "player_2":
+        print("you chose to play against player 2, good luck!")
+        OPPONENT = "player_2"
+def who_won(x,y):
+    won = 0
+    if x == "paper" and y == "rock":
+        print("player 1 got the point!")
+        won = 1
+    elif x == "paper" and y == "scissors":
+        print(f"{OPPONENT} got the point!")
+        won = 2
+    elif x == "paper" and y == "paper":
+        print("non of the players won this round, it is a tie!")
+
+    if x == "rock" and y == "scissors":
+        print("player 1 got the point!")
+        won = 1
+    elif x == "rock" and y == "paper":
+        print(f"{OPPONENT} got the point!")
+        won = 2
+    elif x == "rock" and y == "rock":
+        print("non of the players won this round, it is a tie!")
+
+    if x == "scissors" and y == "paper":
+        print("player 1 got the point!")
+        won = 1
+    elif x == "scissors" and y == "rock":
+        print(f"{OPPONENT} got the point!")
+        won = 2
+    elif x == "scissors" and y == "scissors":
+        print("non of the players won this round, it is a tie!")
+
+    if won == 1:
+        return ("player_1 won")
+    elif OPPONENT == "pc":
+        return ("pc won")
+    elif won == 2:
+        return ("player_2 won")
+    else:
+        return ("tie")
+def rock_paper_scissors(x):
+    if x == "pc":
+        return random.choice(["rock", "paper", "scissors"])
+    else:
+        return input("choose one of the three, rock, paper or scissors!: ")
+def count(x):
+    global score_p1
+    global score_p2
+    if x == "player_1 won":
+        score_p1 += 1
+    elif x == "player_2" or "pc":
+        score_p2 += 1
+    if x == "tie":
+        return
+def next_turn(x):
+    global OPPONENT
+    if x == "player_1":
+        return OPPONENT
+    elif x == OPPONENT:
+        return "player_1"
+def game():
+    turn = "player_1"
+    choose_opponent()
+    while True:
+        leave = input("do you want to stop?:(y/n) ")
+        if leave == "y":
+            return
+        x = rock_paper_scissors(turn)
+        turn = OPPONENT
+        y = rock_paper_scissors(turn)
+        turn = "player_1"
+        result = who_won(x, y)
+        print(result)
+        count(result)
+        if score_p1 >= score_p2 +3:
+            print("player 1 won!")
+            print(f"player 1: {score_p1}, opponent: {score_p2}")
+            return
+        elif score_p2 >= score_p1 +3:
+            print("player 2 won!")
+            print(f"player 1: {score_p1}, opponent: {score_p2}")
+            return
+        print(f"player 1: {score_p1}, opponent: {score_p2}")
+
+game()
